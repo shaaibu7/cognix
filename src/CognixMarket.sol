@@ -72,5 +72,6 @@ contract CognixMarket is ICognixMarket {
         task.status = TaskStatus.Completed;
         (bool success, ) = task.assignee.call{value: task.reward}("");
         require(success, "Payout failed");
+        agentReputation[task.assignee]++;
         emit TaskCompleted(_taskId);
     }
