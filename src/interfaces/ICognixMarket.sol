@@ -13,4 +13,10 @@ interface ICognixMarket {
         uint256 createdAt;
         uint256 updatedAt;
     }
+
+    struct Application {
+        address agent;
+        string proposalURI;
+        uint256 appliedAt;
+    }
 }
