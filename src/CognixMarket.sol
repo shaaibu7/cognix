@@ -64,3 +64,12 @@ contract CognixMarket is ICognixMarket {
         tasks[_taskId].updatedAt = block.timestamp;
         emit ProofSubmitted(_taskId, _proofURI);
     }
+
+    function completeTask(uint256 _taskId) external override onlyEmployer(_taskId) {
+        Task storage task = tasks[_taskId];
+        require(task.status == TaskStatus.ProofSubmitted, "No proof");
+        task.status = TaskStatus.Completed;
+        (bool success, ) = task.assignee.call{value: task.reward}("");
+        require(success, "Payout failed");
+        emit TaskCompleted(_taskId);
+    }
