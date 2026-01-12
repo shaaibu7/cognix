@@ -8,6 +8,7 @@ contract CognixMarket is ICognixMarket {
     address public arbitrator;
     mapping(uint256 => Task) public tasks;
     mapping(uint256 => Application[]) public applications;
+    mapping(address => uint256) public agentReputation;
 
     modifier onlyEmployer(uint256 _taskId) {
         require(tasks[_taskId].employer == msg.sender, "Only employer");
