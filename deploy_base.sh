@@ -29,6 +29,8 @@ else
 fi
 
 echo "🚀 Starting deployment to Base..."
+echo "ℹ️  RPC URL: ${RPC_URL:0:20}..."
+echo "ℹ️  Verifier URL: https://api.etherscan.io/v2/api?chainid=8453"
 echo "ℹ️  Note: '--via-ir' is enabled. This makes compilation SLOW."
 
 # Execute deployment from root

@@ -4,6 +4,11 @@
 
 ---
 
+## 📍 Deployed Address (Base Mainnet)
+**Contract**: [\`0x2860e35b06f005bf046ff601510ece24be8b82d9\`](https://basescan.org/address/0x2860e35b06f005bf046ff601510ece24be8b82d9)
+
+---
+
 ## 🚀 Built on Base
 Cognix leverages **Base** for low-fee, high-throughput agent transactions.
 - **Ethereum Security**: Inherits L1 security.
