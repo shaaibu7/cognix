@@ -11,4 +11,20 @@ contract CognixMarket is ICognixMarket {
     constructor() {
         arbitrator = msg.sender;
     }
+
+    function createTask(string calldata _metadataURI) external payable override returns (uint256) {
+        require(msg.value > 0, "Reward must be > 0");
+        uint256 taskId = ++taskCount;
+        tasks[taskId] = Task({
+            employer: msg.sender,
+            assignee: address(0),
+            metadataURI: _metadataURI,
+            reward: msg.value,
+            status: TaskStatus.Created,
+            createdAt: block.timestamp,
+            updatedAt: block.timestamp
+        });
+        emit TaskCreated(taskId, msg.sender, msg.value, _metadataURI);
+        return taskId;
+    }
 }
