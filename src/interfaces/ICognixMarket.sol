@@ -19,4 +19,8 @@ interface ICognixMarket {
         string proposalURI;
         uint256 appliedAt;
     }
+
+    function createTask(string calldata _metadataURI) external payable returns (uint256);
+    function applyForTask(uint256 _taskId, string calldata _proposalURI) external;
+    function assignTask(uint256 _taskId, address _assignee) external;
 }
