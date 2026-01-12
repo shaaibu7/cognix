@@ -29,3 +29,13 @@ contract CognixMarket is ICognixMarket {
         return taskId;
     }
 }
+
+    function applyForTask(uint256 _taskId, string calldata _proposalURI) external override {
+        require(tasks[_taskId].status == TaskStatus.Created, "Invalid status");
+        applications[_taskId].push(Application({
+            agent: msg.sender,
+            proposalURI: _proposalURI,
+            appliedAt: block.timestamp
+        }));
+        emit TaskApplied(_taskId, msg.sender, _proposalURI);
+    }
