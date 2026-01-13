@@ -21,6 +21,10 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     constructor(address _nativeToken) Ownable(msg.sender) {
         arbitrator = msg.sender;
         nativeToken = IERC20(_nativeToken);
+    }
+
+    function setTokenStatus(address _token, bool _status) external onlyOwner {
+        whitelistedTokens[_token] = _status;
         whitelistedTokens[_nativeToken] = true;
     }
 
