@@ -122,3 +122,109 @@ contract CognixToken {
         return _owner;
     }
 }
+    // Core ERC20 functions
+    
+    /**
+     * @dev Moves amount tokens from the caller's account to to
+     * @param to The address to transfer tokens to
+     * @param amount The amount of tokens to transfer
+     * @return bool indicating success
+     */
+    function transfer(address to, uint256 amount) public returns (bool) {
+        address owner = msg.sender;
+        _transfer(owner, to, amount);
+        return true;
+    }
+    
+    /**
+     * @dev Sets amount as the allowance of spender over the caller's tokens
+     * @param spender The address which will spend the funds
+     * @param amount The amount of tokens to be spent
+     * @return bool indicating success
+     */
+    function approve(address spender, uint256 amount) public returns (bool) {
+        address owner = msg.sender;
+        _approve(owner, spender, amount);
+        return true;
+    }
+    
+    /**
+     * @dev Moves amount tokens from from to to using the allowance mechanism
+     * @param from The address to transfer tokens from
+     * @param to The address to transfer tokens to
+     * @param amount The amount of tokens to transfer
+     * @return bool indicating success
+     */
+    function transferFrom(address from, address to, uint256 amount) public returns (bool) {
+        address spender = msg.sender;
+        _spendAllowance(from, spender, amount);
+        _transfer(from, to, amount);
+        return true;
+    }
+    
+    // Internal functions
+    
+    /**
+     * @dev Moves amount of tokens from from to to
+     * @param from The address to transfer tokens from
+     * @param to The address to transfer tokens to
+     * @param amount The amount of tokens to transfer
+     */
+    function _transfer(address from, address to, uint256 amount) internal {
+        if (from == address(0)) {
+            revert InvalidAddress(from);
+        }
+        if (to == address(0)) {
+            revert InvalidAddress(to);
+        }
+        
+        uint256 fromBalance = _balances[from];
+        if (fromBalance < amount) {
+            revert InsufficientBalance(fromBalance, amount);
+        }
+        
+        unchecked {
+            _balances[from] = fromBalance - amount;
+            // Overflow not possible: the sum of all balances is capped by totalSupply
+            _balances[to] += amount;
+        }
+        
+        emit Transfer(from, to, amount);
+    }
+    
+    /**
+     * @dev Sets amount as the allowance of spender over the owner's tokens
+     * @param owner The address which owns the funds
+     * @param spender The address which will spend the funds
+     * @param amount The amount of tokens to be spent
+     */
+    function _approve(address owner, address spender, uint256 amount) internal {
+        if (owner == address(0)) {
+            revert InvalidAddress(owner);
+        }
+        if (spender == address(0)) {
+            revert InvalidAddress(spender);
+        }
+        
+        _allowances[owner][spender] = amount;
+        emit Approval(owner, spender, amount);
+    }
+    
+    /**
+     * @dev Updates owner's allowance for spender based on spent amount
+     * @param owner The address which owns the funds
+     * @param spender The address which will spend the funds
+     * @param amount The amount of tokens to be spent
+     */
+    function _spendAllowance(address owner, address spender, uint256 amount) internal {
+        uint256 currentAllowance = allowance(owner, spender);
+        if (currentAllowance != type(uint256).max) {
+            if (currentAllowance < amount) {
+                revert InsufficientAllowance(currentAllowance, amount);
+            }
+            unchecked {
+                _approve(owner, spender, currentAllowance - amount);
+            }
+        }
+    }
+}
