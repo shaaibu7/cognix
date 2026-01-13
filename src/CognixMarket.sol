@@ -62,3 +62,9 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         emit TaskApplied(_taskId, msg.sender, _stakeAmount, _proposalURI);
     }
 }
+    function assignTask(uint256 _taskId, address _assignee) external override {
+        tasks[_taskId].assignee = _assignee;
+        tasks[_taskId].status = TaskStatus.Assigned;
+        emit TaskAssigned(_taskId, _assignee);
+    }
+}

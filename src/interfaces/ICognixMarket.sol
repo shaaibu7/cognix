@@ -35,3 +35,4 @@ interface ICognixMarket {
     function createTaskWithToken(address _token, uint256 _amount, string calldata _metadataURI) external returns (uint256);
 }
 }
+}
