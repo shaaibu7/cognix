@@ -293,3 +293,47 @@ contract CognixToken {
         emit Transfer(address(0), account, amount);
     }
 }
+    // Burning functionality
+    
+    /**
+     * @dev Destroys amount tokens from the caller's account, reducing the total supply
+     * @param amount The amount of tokens to burn
+     */
+    function burn(uint256 amount) public {
+        _burn(msg.sender, amount);
+    }
+    
+    /**
+     * @dev Destroys amount tokens from account, deducting from the caller's allowance
+     * @param account The address to burn tokens from
+     * @param amount The amount of tokens to burn
+     */
+    function burnFrom(address account, uint256 amount) public {
+        _spendAllowance(account, msg.sender, amount);
+        _burn(account, amount);
+    }
+    
+    /**
+     * @dev Destroys amount tokens from account, reducing the total supply
+     * @param account The address to burn tokens from
+     * @param amount The amount of tokens to burn
+     */
+    function _burn(address account, uint256 amount) internal {
+        if (account == address(0)) {
+            revert InvalidAddress(account);
+        }
+        
+        uint256 accountBalance = _balances[account];
+        if (accountBalance < amount) {
+            revert InsufficientBalance(accountBalance, amount);
+        }
+        
+        unchecked {
+            _balances[account] = accountBalance - amount;
+            // Overflow not possible: amount <= accountBalance <= totalSupply.
+            _totalSupply -= amount;
+        }
+        
+        emit Transfer(account, address(0), amount);
+    }
+}
