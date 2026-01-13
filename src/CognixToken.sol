@@ -30,6 +30,11 @@ contract CognixToken {
     error InsufficientAllowance(uint256 available, uint256 required);
     error UnauthorizedAccess(address caller, address required);
     error InvalidAddress(address provided);
+    error ZeroAmount();
+    error MaxSupplyExceeded(uint256 currentSupply, uint256 maxSupply);
+    
+    // Constants
+    uint256 public constant MAX_SUPPLY = 1000000000 * 10**18; // 1 billion tokens
     
     /**
      * @dev Constructor that sets the token name, symbol, and initial supply
@@ -283,7 +288,13 @@ contract CognixToken {
             revert InvalidAddress(account);
         }
         
-        _totalSupply += amount;
+        // Check for max supply limit
+        uint256 newTotalSupply = _totalSupply + amount;
+        if (newTotalSupply > MAX_SUPPLY) {
+            revert MaxSupplyExceeded(newTotalSupply, MAX_SUPPLY);
+        }
+        
+        _totalSupply = newTotalSupply;
         unchecked {
             // Overflow not possible: balance + amount is at most totalSupply + amount
             // which is checked above.
@@ -335,5 +346,35 @@ contract CognixToken {
         }
         
         emit Transfer(account, address(0), amount);
+    }
+}
+    
+    // Additional validation functions
+    
+    /**
+     * @dev Validates that an address is not the zero address
+     * @param addr The address to validate
+     */
+    function _validateAddress(address addr) internal pure {
+        if (addr == address(0)) {
+            revert InvalidAddress(addr);
+        }
+    }
+    
+    /**
+     * @dev Validates that an amount is greater than zero
+     * @param amount The amount to validate
+     */
+    function _validateAmount(uint256 amount) internal pure {
+        if (amount == 0) {
+            revert ZeroAmount();
+        }
+    }
+    
+    /**
+     * @dev Returns true if the contract has an owner, false otherwise
+     */
+    function hasOwner() public view returns (bool) {
+        return _owner != address(0);
     }
 }
