@@ -37,3 +37,10 @@ interface ICognixMarket {
 }
 }
 }
+    struct Application {
+        address agent;
+        string proposalURI;
+        uint256 stakedAmount;
+        uint256 appliedAt;
+    }
+}
