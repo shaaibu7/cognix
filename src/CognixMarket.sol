@@ -51,3 +51,14 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         return taskId;
     }
 }
+    function applyForTask(uint256 _taskId, uint256 _stakeAmount, string calldata _proposalURI) 
+        external 
+        override 
+    {
+        if (_stakeAmount > 0) {
+            nativeToken.safeTransferFrom(msg.sender, address(this), _stakeAmount);
+        }
+        applications[_taskId].push(Application(msg.sender, _proposalURI, _stakeAmount, block.timestamp));
+        emit TaskApplied(_taskId, msg.sender, _stakeAmount, _proposalURI);
+    }
+}

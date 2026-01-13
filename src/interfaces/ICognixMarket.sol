@@ -34,3 +34,4 @@ interface ICognixMarket {
     function createTask(string calldata _metadataURI) external payable returns (uint256);
     function createTaskWithToken(address _token, uint256 _amount, string calldata _metadataURI) external returns (uint256);
 }
+}
