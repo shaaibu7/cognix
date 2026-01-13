@@ -23,6 +23,7 @@ interface ICognixMarket {
         uint256 appliedAt;
     }
 
+    event TaskApplied(uint256 indexed taskId, address indexed agent, uint256 stakedAmount, string proposalURI);
     event TaskCreated(uint256 indexed taskId, address indexed employer, address token, uint256 reward, string metadataURI);
     event TaskApplied(uint256 indexed taskId, address indexed agent, uint256 stakedAmount, string proposalURI);
     event TaskAssigned(uint256 indexed taskId, address indexed assignee);
