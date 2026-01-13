@@ -8,6 +8,7 @@ interface ICognixMarket {
         address employer;
         address assignee;
         address token;
+        address token;
         string metadataURI;
         uint256 reward;
         TaskStatus status;
