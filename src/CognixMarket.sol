@@ -14,6 +14,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     IERC20 public nativeToken;
 
     mapping(uint256 => Task) public tasks;
+    mapping(address => bool) public whitelistedTokens;
     mapping(uint256 => Application[]) public applications;
     mapping(address => uint256) public agentReputation;
     mapping(address => bool) public whitelistedTokens;
