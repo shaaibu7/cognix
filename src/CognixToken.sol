@@ -202,6 +202,11 @@ contract CognixToken {
      * @param from The address to transfer tokens from
      * @param to The address to transfer tokens to
      * @param amount The amount of tokens to transfer
+     * 
+     * Gas Optimization Notes:
+     * - Uses unchecked arithmetic where overflow is impossible
+     * - Single SSTORE for balance updates when possible
+     * - Validates addresses before state changes
      */
     function _transfer(address from, address to, uint256 amount) internal {
         if (from == address(0)) {
@@ -217,6 +222,7 @@ contract CognixToken {
         }
         
         unchecked {
+            // Overflow not possible: amount <= fromBalance
             _balances[from] = fromBalance - amount;
             // Overflow not possible: the sum of all balances is capped by totalSupply
             _balances[to] += amount;
@@ -248,6 +254,10 @@ contract CognixToken {
      * @param owner The address which owns the funds
      * @param spender The address which will spend the funds
      * @param amount The amount of tokens to be spent
+     * 
+     * Gas Optimization Notes:
+     * - Skips allowance update for infinite approvals (type(uint256).max)
+     * - Uses unchecked arithmetic for allowance decrease
      */
     function _spendAllowance(address owner, address spender, uint256 amount) internal {
         uint256 currentAllowance = allowance(owner, spender);
@@ -256,6 +266,7 @@ contract CognixToken {
                 revert InsufficientAllowance(currentAllowance, amount);
             }
             unchecked {
+                // Overflow not possible: amount <= currentAllowance
                 _approve(owner, spender, currentAllowance - amount);
             }
         }
