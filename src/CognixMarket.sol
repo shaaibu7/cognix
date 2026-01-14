@@ -29,6 +29,11 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     mapping(uint256 => Application[]) public applications;
     mapping(address => uint256) public agentReputation; // Count of successfully completed tasks
     mapping(address => bool) public blacklistedAgents;
+    
+    event ArbitratorChanged(address indexed oldArbitrator, address indexed newArbitrator);
+    event FeeCollectorChanged(address indexed oldCollector, address indexed newCollector);
+    event PlatformFeeChanged(uint256 oldFee, uint256 newFee);
+    event AgentBlacklisted(address indexed agent, bool status);
 
     modifier onlyEmployer(uint256 _taskId) {
         if (tasks[_taskId].employer != msg.sender) revert NotEmployer();
@@ -51,20 +56,27 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     }
 
     function setArbitrator(address _arbitrator) external onlyOwner {
+        address oldArbitrator = arbitrator;
         arbitrator = _arbitrator;
+        emit ArbitratorChanged(oldArbitrator, _arbitrator);
     }
 
     function setFeeCollector(address _feeCollector) external onlyOwner {
+        address oldCollector = feeCollector;
         feeCollector = _feeCollector;
+        emit FeeCollectorChanged(oldCollector, _feeCollector);
     }
 
     function setPlatformFee(uint256 _feePercent) external onlyOwner {
         require(_feePercent <= 10, "Fee too high"); // Max 10%
+        uint256 oldFee = platformFeePercent;
         platformFeePercent = _feePercent;
+        emit PlatformFeeChanged(oldFee, _feePercent);
     }
 
     function blacklistAgent(address _agent, bool _status) external onlyOwner {
         blacklistedAgents[_agent] = _status;
+        emit AgentBlacklisted(_agent, _status);
     }
 
     /**
