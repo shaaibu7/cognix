@@ -55,6 +55,10 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         verifiedAgents[_agent] = _verified;
     }
 
+    function setMinTaskReward(uint256 _minReward) external onlyOwner {
+        minTaskReward = _minReward;
+    }
+
     /**
      * @notice Create a new task and escrow the reward.
      */
