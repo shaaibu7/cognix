@@ -10,6 +10,15 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  * @notice A decentralized marketplace for AI Agent tasks with escrow and arbitration.
  */
 contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
+    // Custom errors for gas efficiency
+    error NotEmployer();
+    error NotAssignee();
+    error InvalidTaskStatus();
+    error InvalidReward();
+    error TransferFailed();
+    error NotAuthorized();
+    error OnlyArbitrator();
+    error TaskNotDisputed();
     uint256 public taskCount;
     address public arbitrator;
 
@@ -18,7 +27,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     mapping(address => uint256) public agentReputation; // Count of successfully completed tasks
 
     modifier onlyEmployer(uint256 _taskId) {
-        require(tasks[_taskId].employer == msg.sender, "Only employer");
+        if (tasks[_taskId].employer != msg.sender) revert NotEmployer();
         _;
     }
 
