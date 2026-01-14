@@ -12,6 +12,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     uint256 public taskCount;
     address public arbitrator;
+    uint256 public platformFee; // Fee percentage (basis points, e.g., 250 = 2.5%)
 
     mapping(uint256 => Task) public tasks;
     mapping(uint256 => Application[]) public applications;
