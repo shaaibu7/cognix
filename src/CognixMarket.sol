@@ -19,11 +19,14 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     error NotAuthorized();
     error OnlyArbitrator();
     error TaskNotDisputed();
+    error InvalidTaskId();
+    error MinRewardNotMet();
     
     uint256 public taskCount;
     address public arbitrator;
     uint256 public platformFeePercent = 2; // 2% platform fee
     address public feeCollector;
+    uint256 public minTaskReward = 0.001 ether; // Minimum task reward
 
     mapping(uint256 => Task) public tasks;
     mapping(uint256 => Application[]) public applications;
@@ -79,11 +82,16 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         emit AgentBlacklisted(_agent, _status);
     }
 
+    function setMinTaskReward(uint256 _minReward) external onlyOwner {
+        minTaskReward = _minReward;
+    }
+
     /**
      * @notice Create a new task and escrow the reward.
      */
     function createTask(string calldata _metadataURI) external payable override returns (uint256) {
         if (msg.value == 0) revert InvalidReward();
+        if (msg.value < minTaskReward) revert MinRewardNotMet();
 
         uint256 taskId = ++taskCount;
         tasks[taskId] = Task({
