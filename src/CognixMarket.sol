@@ -53,6 +53,15 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         arbitrator = _arbitrator;
     }
 
+    function setFeeCollector(address _feeCollector) external onlyOwner {
+        feeCollector = _feeCollector;
+    }
+
+    function setPlatformFee(uint256 _feePercent) external onlyOwner {
+        require(_feePercent <= 10, "Fee too high"); // Max 10%
+        platformFeePercent = _feePercent;
+    }
+
     /**
      * @notice Create a new task and escrow the reward.
      */
