@@ -28,6 +28,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     mapping(uint256 => Task) public tasks;
     mapping(uint256 => Application[]) public applications;
     mapping(address => uint256) public agentReputation; // Count of successfully completed tasks
+    mapping(address => bool) public blacklistedAgents;
 
     modifier onlyEmployer(uint256 _taskId) {
         if (tasks[_taskId].employer != msg.sender) revert NotEmployer();
@@ -60,6 +61,10 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     function setPlatformFee(uint256 _feePercent) external onlyOwner {
         require(_feePercent <= 10, "Fee too high"); // Max 10%
         platformFeePercent = _feePercent;
+    }
+
+    function blacklistAgent(address _agent, bool _status) external onlyOwner {
+        blacklistedAgents[_agent] = _status;
     }
 
     /**
