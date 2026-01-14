@@ -167,8 +167,12 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
      */
     function disputeTask(uint256 _taskId) external override {
         Task storage task = tasks[_taskId];
-        require(msg.sender == task.employer || msg.sender == task.assignee, "Not authorized");
-        require(task.status == TaskStatus.Assigned || task.status == TaskStatus.ProofSubmitted, "Invalid status for dispute");
+        if (msg.sender != task.employer && msg.sender != task.assignee) {
+            revert NotAuthorized();
+        }
+        if (task.status != TaskStatus.Assigned && task.status != TaskStatus.ProofSubmitted) {
+            revert InvalidTaskStatus();
+        }
 
         task.status = TaskStatus.Disputed;
         task.updatedAt = block.timestamp;
