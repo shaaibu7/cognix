@@ -73,6 +73,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
      */
     function createTask(string calldata _metadataURI) external payable override returns (uint256) {
         require(msg.value >= minTaskReward, "Reward below minimum");
+        require(bytes(_metadataURI).length > 0, "Empty metadata URI");
 
         uint256 taskId = ++taskCount;
         tasks[taskId] = Task({
