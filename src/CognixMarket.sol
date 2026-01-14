@@ -128,14 +128,16 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         nonReentrant 
     {
         Task storage task = tasks[_taskId];
-        require(task.status == TaskStatus.ProofSubmitted || task.status == TaskStatus.Assigned, "Cannot complete");
+        if (task.status != TaskStatus.ProofSubmitted && task.status != TaskStatus.Assigned) {
+            revert InvalidTaskStatus();
+        }
 
         task.status = TaskStatus.Completed;
         task.updatedAt = block.timestamp;
         agentReputation[task.assignee]++;
 
         (bool success, ) = task.assignee.call{value: task.reward}("");
-        require(success, "Transfer failed");
+        if (!success) revert TransferFailed();
 
         emit TaskCompleted(_taskId);
     }
