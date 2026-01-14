@@ -49,6 +49,10 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         platformFee = _fee;
     }
 
+    function setVerifiedAgent(address _agent, bool _verified) external onlyOwner {
+        verifiedAgents[_agent] = _verified;
+    }
+
     /**
      * @notice Create a new task and escrow the reward.
      */
