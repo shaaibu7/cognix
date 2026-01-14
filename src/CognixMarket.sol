@@ -98,6 +98,8 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         override 
         inStatus(_taskId, TaskStatus.Created) 
     {
+        require(bytes(_proposalURI).length > 0, "Empty proposal URI");
+        
         applications[_taskId].push(Application({
             agent: msg.sender,
             proposalURI: _proposalURI,
