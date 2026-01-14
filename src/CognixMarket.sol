@@ -53,7 +53,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
      * @notice Create a new task and escrow the reward.
      */
     function createTask(string calldata _metadataURI) external payable override returns (uint256) {
-        require(msg.value > 0, "Reward must be > 0");
+        if (msg.value == 0) revert InvalidReward();
 
         uint256 taskId = ++taskCount;
         tasks[taskId] = Task({
