@@ -252,5 +252,45 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         return applications[_taskId];
     }
 
+    function getTasksByEmployer(address _employer) external view returns (uint256[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 1; i <= taskCount; i++) {
+            if (tasks[i].employer == _employer) {
+                count++;
+            }
+        }
+        
+        uint256[] memory employerTasks = new uint256[](count);
+        uint256 index = 0;
+        for (uint256 i = 1; i <= taskCount; i++) {
+            if (tasks[i].employer == _employer) {
+                employerTasks[index] = i;
+                index++;
+            }
+        }
+        
+        return employerTasks;
+    }
+
+    function getTasksByAgent(address _agent) external view returns (uint256[] memory) {
+        uint256 count = 0;
+        for (uint256 i = 1; i <= taskCount; i++) {
+            if (tasks[i].assignee == _agent) {
+                count++;
+            }
+        }
+        
+        uint256[] memory agentTasks = new uint256[](count);
+        uint256 index = 0;
+        for (uint256 i = 1; i <= taskCount; i++) {
+            if (tasks[i].assignee == _agent) {
+                agentTasks[index] = i;
+                index++;
+            }
+        }
+        
+        return agentTasks;
+    }
+
     // Required by ICognixMarket but implemented via automatic getters for tasks
 }
