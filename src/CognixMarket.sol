@@ -116,6 +116,8 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         onlyEmployer(_taskId) 
         inStatus(_taskId, TaskStatus.Created) 
     {
+        require(!blacklistedAgents[_assignee], "Cannot assign to blacklisted agent");
+        
         tasks[_taskId].assignee = _assignee;
         tasks[_taskId].status = TaskStatus.Assigned;
         tasks[_taskId].updatedAt = block.timestamp;
