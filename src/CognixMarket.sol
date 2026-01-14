@@ -149,6 +149,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         uint256 agentPayment = task.reward - fee;
         
         agentEarnings[task.assignee] += agentPayment;
+        totalPlatformEarnings += fee;
 
         (bool success, ) = task.assignee.call{value: agentPayment}("");
         require(success, "Transfer failed");
