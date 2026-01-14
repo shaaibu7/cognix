@@ -157,7 +157,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         task.updatedAt = block.timestamp;
 
         (bool success, ) = task.employer.call{value: task.reward}("");
-        require(success, "Refund failed");
+        if (!success) revert TransferFailed();
 
         emit TaskCancelled(_taskId);
     }
