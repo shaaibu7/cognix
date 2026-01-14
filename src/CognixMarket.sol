@@ -19,8 +19,11 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     error NotAuthorized();
     error OnlyArbitrator();
     error TaskNotDisputed();
+    
     uint256 public taskCount;
     address public arbitrator;
+    uint256 public platformFeePercent = 2; // 2% platform fee
+    address public feeCollector;
 
     mapping(uint256 => Task) public tasks;
     mapping(uint256 => Application[]) public applications;
@@ -43,6 +46,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
 
     constructor() Ownable(msg.sender) {
         arbitrator = msg.sender;
+        feeCollector = msg.sender;
     }
 
     function setArbitrator(address _arbitrator) external onlyOwner {
