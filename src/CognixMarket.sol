@@ -39,6 +39,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     constructor() Ownable(msg.sender) {
         arbitrator = msg.sender;
         platformFee = 250; // Default 2.5% fee
+        minTaskReward = 0.001 ether; // Default minimum reward
     }
 
     function setArbitrator(address _arbitrator) external onlyOwner {
