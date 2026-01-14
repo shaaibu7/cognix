@@ -189,7 +189,12 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         if (_payAgent) {
             task.status = TaskStatus.Completed;
             agentReputation[task.assignee]++;
-            (bool success, ) = task.assignee.call{value: task.reward}("");
+            
+            uint256 fee = (task.reward * platformFee) / 10000;
+            uint256 agentPayment = task.reward - fee;
+            agentEarnings[task.assignee] += agentPayment;
+            
+            (bool success, ) = task.assignee.call{value: agentPayment}("");
             require(success, "Payment failed");
         } else {
             task.status = TaskStatus.Cancelled;
