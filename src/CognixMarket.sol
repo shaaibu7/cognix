@@ -149,8 +149,19 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         task.updatedAt = block.timestamp;
         agentReputation[task.assignee]++;
 
-        (bool success, ) = task.assignee.call{value: task.reward}("");
-        if (!success) revert TransferFailed();
+        // Calculate platform fee
+        uint256 fee = (task.reward * platformFeePercent) / 100;
+        uint256 agentPayment = task.reward - fee;
+
+        // Transfer to agent
+        (bool success1, ) = task.assignee.call{value: agentPayment}("");
+        if (!success1) revert TransferFailed();
+
+        // Transfer fee to collector
+        if (fee > 0) {
+            (bool success2, ) = feeCollector.call{value: fee}("");
+            if (!success2) revert TransferFailed();
+        }
 
         emit TaskCompleted(_taskId);
     }
