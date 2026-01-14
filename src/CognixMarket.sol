@@ -32,6 +32,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     mapping(uint256 => Application[]) public applications;
     mapping(address => uint256) public agentReputation; // Count of successfully completed tasks
     mapping(address => bool) public blacklistedAgents;
+    mapping(uint256 => uint256) public taskDeadlines; // Optional deadlines for tasks
     
     event ArbitratorChanged(address indexed oldArbitrator, address indexed newArbitrator);
     event FeeCollectorChanged(address indexed oldCollector, address indexed newCollector);
@@ -143,6 +144,15 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         tasks[_taskId].updatedAt = block.timestamp;
 
         emit TaskAssigned(_taskId, _assignee);
+    }
+
+    function setTaskDeadline(uint256 _taskId, uint256 _deadline) 
+        external 
+        onlyEmployer(_taskId) 
+        inStatus(_taskId, TaskStatus.Created) 
+    {
+        require(_deadline > block.timestamp, "Deadline must be in future");
+        taskDeadlines[_taskId] = _deadline;
     }
 
     /**
