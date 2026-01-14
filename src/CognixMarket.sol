@@ -32,12 +32,12 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     }
 
     modifier onlyAssignee(uint256 _taskId) {
-        require(tasks[_taskId].assignee == msg.sender, "Only assignee");
+        if (tasks[_taskId].assignee != msg.sender) revert NotAssignee();
         _;
     }
 
     modifier inStatus(uint256 _taskId, TaskStatus _status) {
-        require(tasks[_taskId].status == _status, "Invalid task status");
+        if (tasks[_taskId].status != _status) revert InvalidTaskStatus();
         _;
     }
 
