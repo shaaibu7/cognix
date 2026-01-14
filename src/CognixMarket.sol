@@ -60,6 +60,14 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         minTaskReward = _minReward;
     }
 
+    function withdrawPlatformFees() external onlyOwner nonReentrant {
+        uint256 amount = totalPlatformEarnings;
+        totalPlatformEarnings = 0;
+        
+        (bool success, ) = owner().call{value: amount}("");
+        require(success, "Withdrawal failed");
+    }
+
     /**
      * @notice Create a new task and escrow the reward.
      */
