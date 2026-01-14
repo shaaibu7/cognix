@@ -20,6 +20,7 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
     mapping(address => uint256) public agentReputation; // Count of successfully completed tasks
     mapping(address => uint256) public agentEarnings; // Total earnings per agent
     mapping(address => bool) public verifiedAgents; // Verified agent status
+    uint256 public totalPlatformEarnings; // Total fees collected
 
     modifier onlyEmployer(uint256 _taskId) {
         require(tasks[_taskId].employer == msg.sender, "Only employer");
