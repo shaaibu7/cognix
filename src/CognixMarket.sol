@@ -96,6 +96,8 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         override 
         inStatus(_taskId, TaskStatus.Created) 
     {
+        require(!blacklistedAgents[msg.sender], "Agent blacklisted");
+        
         applications[_taskId].push(Application({
             agent: msg.sender,
             proposalURI: _proposalURI,
