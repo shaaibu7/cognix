@@ -184,19 +184,19 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
      * @notice Arbitrator resolves the dispute.
      */
     function resolveDispute(uint256 _taskId, bool _payAgent) external nonReentrant {
-        require(msg.sender == arbitrator, "Only arbitrator");
+        if (msg.sender != arbitrator) revert OnlyArbitrator();
         Task storage task = tasks[_taskId];
-        require(task.status == TaskStatus.Disputed, "Not disputed");
+        if (task.status != TaskStatus.Disputed) revert TaskNotDisputed();
 
         if (_payAgent) {
             task.status = TaskStatus.Completed;
             agentReputation[task.assignee]++;
             (bool success, ) = task.assignee.call{value: task.reward}("");
-            require(success, "Payment failed");
+            if (!success) revert TransferFailed();
         } else {
             task.status = TaskStatus.Cancelled;
             (bool success, ) = task.employer.call{value: task.reward}("");
-            require(success, "Refund failed");
+            if (!success) revert TransferFailed();
         }
 
         emit DisputeResolved(_taskId, _payAgent);
