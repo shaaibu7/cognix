@@ -234,5 +234,9 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable {
         return applications[_taskId];
     }
 
+    function getAgentStats(address _agent) external view returns (uint256 reputation, uint256 earnings, bool verified) {
+        return (agentReputation[_agent], agentEarnings[_agent], verifiedAgents[_agent]);
+    }
+
     // Required by ICognixMarket but implemented via automatic getters for tasks
 }
