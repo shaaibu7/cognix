@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 /// @title Cognix Token - ERC20 Implementation
+/// @notice A standard ERC20 token with transfer and approval functionality
 contract CognixToken {
     string public name = "Cognix Token";
     string public symbol = "CGX";
