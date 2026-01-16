@@ -71,7 +71,10 @@ contract CognixToken {
         
         balanceOf[from] -= amount;
         balanceOf[to] += amount;
-        allowance[from][msg.sender] -= amount;
+        
+        unchecked {
+            allowance[from][msg.sender] -= amount;
+        }
         
         emit Transfer(from, to, amount);
         return true;
