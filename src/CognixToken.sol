@@ -70,15 +70,18 @@ contract CognixToken {
     function transferFrom(address from, address to, uint256 amount) external returns (bool success) {
         require(from != address(0), "Transfer from zero address");
         require(to != address(0), "Transfer to zero address");
-        require(balanceOf[from] >= amount, "Insufficient balance");
-        require(allowance[from][msg.sender] >= amount, "Insufficient allowance");
         
-        balanceOf[from] -= amount;
-        balanceOf[to] += amount;
+        uint256 fromBalance = balanceOf[from];
+        require(fromBalance >= amount, "Insufficient balance");
+        
+        uint256 currentAllowance = allowance[from][msg.sender];
+        require(currentAllowance >= amount, "Insufficient allowance");
         
         unchecked {
-            allowance[from][msg.sender] -= amount;
+            balanceOf[from] = fromBalance - amount;
+            allowance[from][msg.sender] = currentAllowance - amount;
         }
+        balanceOf[to] += amount;
         
         emit Transfer(from, to, amount);
         return true;
