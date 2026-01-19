@@ -70,3 +70,76 @@ contract CognixMarketTest is Test {
         vm.stopPrank();
     }
 }
+    
+    function testAssignTask() public {
+        vm.prank(employer);
+        uint256 taskId = market.createTask{value: 1 ether}("ipfs://metadata");
+        
+        vm.prank(employer);
+        market.assignTask(taskId, agent);
+        
+        (, address assignee,,,, ICognixMarket.TaskStatus status,,) = market.tasks(taskId);
+        assertEq(assignee, agent);
+        assertTrue(status == ICognixMarket.TaskStatus.Assigned);
+    }
+    
+    function testSubmitProof() public {
+        vm.prank(employer);
+        uint256 taskId = market.createTask{value: 1 ether}("ipfs://metadata");
+        
+        vm.prank(employer);
+        market.assignTask(taskId, agent);
+        
+        vm.prank(agent);
+        market.submitProof(taskId, "ipfs://proof");
+        
+        (,,,,, ICognixMarket.TaskStatus status,,) = market.tasks(taskId);
+        assertTrue(status == ICognixMarket.TaskStatus.ProofSubmitted);
+    }
+    
+    function testCompleteTask() public {
+        vm.prank(employer);
+        uint256 taskId = market.createTask{value: 1 ether}("ipfs://metadata");
+        
+        vm.prank(employer);
+        market.assignTask(taskId, agent);
+        
+        vm.prank(agent);
+        market.submitProof(taskId, "ipfs://proof");
+        
+        uint256 agentBalanceBefore = agent.balance;
+        uint256 reputationBefore = market.agentReputation(agent);
+        
+        vm.prank(employer);
+        market.completeTask(taskId);
+        
+        (,,,,, ICognixMarket.TaskStatus status,,) = market.tasks(taskId);
+        assertTrue(status == ICognixMarket.TaskStatus.Completed);
+        assertEq(agent.balance, agentBalanceBefore + 1 ether);
+        assertGt(market.agentReputation(agent), reputationBefore);
+    }
+    
+    function testRaiseAndResolveDispute() public {
+        vm.prank(employer);
+        uint256 taskId = market.createTask{value: 1 ether}("ipfs://metadata");
+        
+        vm.prank(employer);
+        market.assignTask(taskId, agent);
+        
+        vm.prank(agent);
+        market.submitProof(taskId, "ipfs://proof");
+        
+        vm.prank(employer);
+        market.raiseDispute(taskId);
+        
+        (,,,,, ICognixMarket.TaskStatus status,,) = market.tasks(taskId);
+        assertTrue(status == ICognixMarket.TaskStatus.Disputed);
+        
+        uint256 agentBalanceBefore = agent.balance;
+        
+        vm.prank(address(this)); // arbitrator
+        market.resolveDispute(taskId, false); // favor agent
+        
+        assertEq(agent.balance, agentBalanceBefore + 1 ether);
+    }
+}
