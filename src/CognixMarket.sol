@@ -50,28 +50,47 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable, Pausable {
     function createTaskWithToken(address _token, uint256 _amount, string calldata _metadataURI) 
         external 
         override 
+        nonReentrant 
+        whenNotPaused 
         returns (uint256) 
     {
         require(whitelistedTokens[_token], "Token not whitelisted");
         require(_amount > 0, "Amount must be > 0");
         IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
         uint256 taskId = ++taskCount;
-        tasks[taskId] = Task(msg.sender, address(0), _token, _metadataURI, _amount, TaskStatus.Created, block.timestamp, block.timestamp);
+        tasks[taskId] = Task({
+            employer: msg.sender,
+            assignee: address(0),
+            token: _token,
+            metadataURI: _metadataURI,
+            reward: _amount,
+            status: TaskStatus.Created,
+            createdAt: block.timestamp,
+            updatedAt: block.timestamp
+        });
         emit TaskCreated(taskId, msg.sender, _token, _amount, _metadataURI);
         return taskId;
     }
-}
     function applyForTask(uint256 _taskId, uint256 _stakeAmount, string calldata _proposalURI) 
         external 
         override 
+        nonReentrant 
+        whenNotPaused 
     {
+        require(_taskId > 0 && _taskId <= taskCount, "Invalid task ID");
+        require(tasks[_taskId].status == TaskStatus.Created, "Task not available");
+        
         if (_stakeAmount > 0) {
             nativeToken.safeTransferFrom(msg.sender, address(this), _stakeAmount);
         }
-        applications[_taskId].push(Application(msg.sender, _proposalURI, _stakeAmount, block.timestamp));
+        applications[_taskId].push(Application({
+            agent: msg.sender,
+            proposalURI: _proposalURI,
+            stakedAmount: _stakeAmount,
+            appliedAt: block.timestamp
+        }));
         emit TaskApplied(_taskId, msg.sender, _stakeAmount, _proposalURI);
     }
-}
     function assignTask(uint256 _taskId, address _assignee) external override {
         tasks[_taskId].assignee = _assignee;
         tasks[_taskId].status = TaskStatus.Assigned;
