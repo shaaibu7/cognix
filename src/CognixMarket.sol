@@ -91,9 +91,24 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable, Pausable {
         }));
         emit TaskApplied(_taskId, msg.sender, _stakeAmount, _proposalURI);
     }
-    function assignTask(uint256 _taskId, address _assignee) external override {
+    function assignTask(uint256 _taskId, address _assignee) external override whenNotPaused {
+        require(_taskId > 0 && _taskId <= taskCount, "Invalid task ID");
+        require(tasks[_taskId].employer == msg.sender, "Only employer can assign");
+        require(tasks[_taskId].status == TaskStatus.Created, "Task not available for assignment");
+        require(_assignee != address(0), "Invalid assignee");
+        
         tasks[_taskId].assignee = _assignee;
         tasks[_taskId].status = TaskStatus.Assigned;
+        tasks[_taskId].updatedAt = block.timestamp;
         emit TaskAssigned(_taskId, _assignee);
     }
-}
+
+    function submitProof(uint256 _taskId, string calldata _proofURI) external whenNotPaused {
+        require(_taskId > 0 && _taskId <= taskCount, "Invalid task ID");
+        require(tasks[_taskId].assignee == msg.sender, "Only assignee can submit proof");
+        require(tasks[_taskId].status == TaskStatus.Assigned, "Task not assigned");
+        
+        tasks[_taskId].status = TaskStatus.ProofSubmitted;
+        tasks[_taskId].updatedAt = block.timestamp;
+        emit ProofSubmitted(_taskId, _proofURI);
+    }
