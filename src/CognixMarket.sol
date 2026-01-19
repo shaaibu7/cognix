@@ -112,3 +112,43 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable, Pausable {
         tasks[_taskId].updatedAt = block.timestamp;
         emit ProofSubmitted(_taskId, _proofURI);
     }
+    function completeTask(uint256 _taskId) external nonReentrant whenNotPaused {
+        require(_taskId > 0 && _taskId <= taskCount, "Invalid task ID");
+        require(tasks[_taskId].employer == msg.sender, "Only employer can complete");
+        require(tasks[_taskId].status == TaskStatus.ProofSubmitted, "Proof not submitted");
+        
+        Task storage task = tasks[_taskId];
+        task.status = TaskStatus.Completed;
+        task.updatedAt = block.timestamp;
+        
+        // Transfer reward to assignee
+        if (task.token == address(0)) {
+            payable(task.assignee).transfer(task.reward);
+        } else {
+            IERC20(task.token).safeTransfer(task.assignee, task.reward);
+        }
+        
+        // Update reputation
+        agentReputation[task.assignee] += task.reward / 1e15; // Weighted by task value
+        
+        emit TaskCompleted(_taskId);
+    }
+
+    function cancelTask(uint256 _taskId) external nonReentrant whenNotPaused {
+        require(_taskId > 0 && _taskId <= taskCount, "Invalid task ID");
+        require(tasks[_taskId].employer == msg.sender, "Only employer can cancel");
+        require(tasks[_taskId].status == TaskStatus.Created || tasks[_taskId].status == TaskStatus.Assigned, "Cannot cancel task");
+        
+        Task storage task = tasks[_taskId];
+        task.status = TaskStatus.Cancelled;
+        task.updatedAt = block.timestamp;
+        
+        // Refund employer
+        if (task.token == address(0)) {
+            payable(task.employer).transfer(task.reward);
+        } else {
+            IERC20(task.token).safeTransfer(task.employer, task.reward);
+        }
+        
+        emit TaskCancelled(_taskId);
+    }
