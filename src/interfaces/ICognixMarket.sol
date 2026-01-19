@@ -8,7 +8,6 @@ interface ICognixMarket {
         address employer;
         address assignee;
         address token;
-        address token;
         string metadataURI;
         uint256 reward;
         TaskStatus status;
@@ -23,7 +22,6 @@ interface ICognixMarket {
         uint256 appliedAt;
     }
 
-    event TaskApplied(uint256 indexed taskId, address indexed agent, uint256 stakedAmount, string proposalURI);
     event TaskCreated(uint256 indexed taskId, address indexed employer, address token, uint256 reward, string metadataURI);
     event TaskApplied(uint256 indexed taskId, address indexed agent, uint256 stakedAmount, string proposalURI);
     event TaskAssigned(uint256 indexed taskId, address indexed assignee);
@@ -35,13 +33,6 @@ interface ICognixMarket {
 
     function createTask(string calldata _metadataURI) external payable returns (uint256);
     function createTaskWithToken(address _token, uint256 _amount, string calldata _metadataURI) external returns (uint256);
-}
-}
-}
-    struct Application {
-        address agent;
-        string proposalURI;
-        uint256 stakedAmount;
-        uint256 appliedAt;
-    }
+    function applyForTask(uint256 _taskId, uint256 _stakeAmount, string calldata _proposalURI) external;
+    function assignTask(uint256 _taskId, address _assignee) external;
 }
