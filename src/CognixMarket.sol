@@ -127,14 +127,21 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable, Pausable {
         task.status = TaskStatus.Completed;
         task.updatedAt = block.timestamp;
         
+        // Calculate platform fee
+        uint256 fee = (task.reward * platformFee) / 10000;
+        uint256 agentReward = task.reward - fee;
+        
         // Transfer reward to assignee
         if (task.token == address(0)) {
-            payable(task.assignee).transfer(task.reward);
+            payable(task.assignee).transfer(agentReward);
+            if (fee > 0) payable(owner()).transfer(fee);
         } else {
-            IERC20(task.token).safeTransfer(task.assignee, task.reward);
+            IERC20(task.token).safeTransfer(task.assignee, agentReward);
+            if (fee > 0) IERC20(task.token).safeTransfer(owner(), fee);
         }
         
-        // Update reputation
+        // Update reputation using library
+        agentStats[task.assignee].updateStats(task.reward, true, false);
         agentReputation[task.assignee] += task.reward / 1e15; // Weighted by task value
         
         emit TaskCompleted(_taskId);
