@@ -241,3 +241,61 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable, Pausable {
     event ArbitratorUpdated(address indexed newArbitrator);
     event EmergencyWithdraw(address indexed token, uint256 amount);
 }
+    function createTaskWithDeadline(
+        string calldata _metadataURI,
+        uint256 _deadline
+    ) external payable nonReentrant whenNotPaused returns (uint256) {
+        require(msg.value > 0, "Reward must be > 0");
+        require(_deadline > block.timestamp, "Invalid deadline");
+        
+        uint256 taskId = ++taskCount;
+        tasks[taskId] = Task({
+            employer: msg.sender,
+            assignee: address(0),
+            token: address(0),
+            metadataURI: _metadataURI,
+            reward: msg.value,
+            status: TaskStatus.Created,
+            createdAt: block.timestamp,
+            updatedAt: block.timestamp
+        });
+        
+        taskDeadlines[taskId] = _deadline;
+        emit TaskCreated(taskId, msg.sender, address(0), msg.value, _metadataURI);
+        return taskId;
+    }
+
+    function verifyAgent(address _agent) external onlyOwner {
+        verifiedAgents[_agent] = true;
+        emit AgentVerified(_agent);
+    }
+
+    function setPlatformFee(uint256 _fee) external onlyOwner {
+        require(_fee <= 1000, "Fee too high"); // Max 10%
+        platformFee = _fee;
+        emit PlatformFeeUpdated(_fee);
+    }
+
+    function getAgentStats(address _agent) external view returns (
+        uint256 totalTasks,
+        uint256 completedTasks,
+        uint256 disputedTasks,
+        uint256 totalEarned,
+        uint256 score,
+        uint256 successRate
+    ) {
+        ReputationLib.AgentStats storage stats = agentStats[_agent];
+        return (
+            stats.totalTasks,
+            stats.completedTasks,
+            stats.disputedTasks,
+            stats.totalEarned,
+            stats.score,
+            stats.getSuccessRate()
+        );
+    }
+
+    // Additional events
+    event AgentVerified(address indexed agent);
+    event PlatformFeeUpdated(uint256 newFee);
+    event DeadlineSet(uint256 indexed taskId, uint256 deadline);
