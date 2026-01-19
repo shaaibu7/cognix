@@ -198,3 +198,40 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable, Pausable {
         
         emit DisputeResolved(_taskId, !_favorEmployer);
     }
+    function setArbitrator(address _newArbitrator) external onlyOwner {
+        require(_newArbitrator != address(0), "Invalid arbitrator");
+        arbitrator = _newArbitrator;
+        emit ArbitratorUpdated(_newArbitrator);
+    }
+
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    function emergencyWithdraw(address _token, uint256 _amount) external onlyOwner {
+        require(_amount > 0, "Amount must be > 0");
+        if (_token == address(0)) {
+            payable(owner()).transfer(_amount);
+        } else {
+            IERC20(_token).safeTransfer(owner(), _amount);
+        }
+        emit EmergencyWithdraw(_token, _amount);
+    }
+
+    function getTaskApplications(uint256 _taskId) external view returns (Application[] memory) {
+        return applications[_taskId];
+    }
+
+    function getTaskCount() external view returns (uint256) {
+        return taskCount;
+    }
+
+    // Events for new functionality
+    event TokenWhitelistUpdated(address indexed token, bool status);
+    event ArbitratorUpdated(address indexed newArbitrator);
+    event EmergencyWithdraw(address indexed token, uint256 amount);
+}
