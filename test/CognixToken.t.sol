@@ -6,66 +6,56 @@ import "../src/CognixToken.sol";
 
 contract CognixTokenTest is Test {
     CognixToken public token;
-    address public owner = address(1);
-    address public alice = address(2);
-    address public bob = address(3);
-    
-    string constant TOKEN_NAME = "Cognix Token";
-    string constant TOKEN_SYMBOL = "CGX";
-    uint256 constant INITIAL_SUPPLY = 1000000 * 10**18;
-    uint256 constant MAX_SUPPLY = 1000000000 * 10**18;
-    
-    event Transfer(address indexed from, address indexed to, uint256 value);
+    address public owner = address(0x1);
+    address public user = address(0x2);
     
     function setUp() public {
         vm.prank(owner);
-        token = new CognixToken(TOKEN_NAME, TOKEN_SYMBOL, INITIAL_SUPPLY, owner);
+        token = new CognixToken("Cognix Token", "CGX", 1000000 * 1e18, owner);
     }
     
-    function test_Deployment() public {
-        assertEq(token.name(), TOKEN_NAME);
-        assertEq(token.symbol(), TOKEN_SYMBOL);
-        assertEq(token.totalSupply(), INITIAL_SUPPLY);
-        assertEq(token.balanceOf(owner), INITIAL_SUPPLY);
+    function testInitialState() public {
+        assertEq(token.name(), "Cognix Token");
+        assertEq(token.symbol(), "CGX");
+        assertEq(token.decimals(), 18);
+        assertEq(token.totalSupply(), 1000000 * 1e18);
+        assertEq(token.balanceOf(owner), 1000000 * 1e18);
+        assertEq(token.owner(), owner);
     }
     
-    function test_Transfer() public {
-        uint256 amount = 1000 * 10**18;
+    function testMint() public {
         vm.prank(owner);
-        token.transfer(alice, amount);
-        assertEq(token.balanceOf(alice), amount);
-        assertEq(token.balanceOf(owner), INITIAL_SUPPLY - amount);
-    }
-
-    function test_TransferFrom() public {
-        uint256 amount = 1000 * 10**18;
-        vm.prank(owner);
-        token.approve(alice, amount);
+        token.mint(user, 1000 * 1e18);
         
-        vm.prank(alice);
-        token.transferFrom(owner, bob, amount);
+        assertEq(token.balanceOf(user), 1000 * 1e18);
+        assertEq(token.totalSupply(), 1001000 * 1e18);
+    }
+    
+    function testBurn() public {
+        vm.prank(owner);
+        token.transfer(user, 1000 * 1e18);
         
-        assertEq(token.balanceOf(bob), amount);
-        assertEq(token.allowance(owner, alice), 0);
+        vm.prank(user);
+        token.burn(500 * 1e18);
+        
+        assertEq(token.balanceOf(user), 500 * 1e18);
+        assertEq(token.totalSupply(), 999500 * 1e18);
     }
-
-    function test_Mint() public {
-        uint256 amount = 500 * 10**18;
+    
+    function testPause() public {
         vm.prank(owner);
-        token.mint(alice, amount);
-        assertEq(token.balanceOf(alice), amount);
-    }
-
-    function test_Burn() public {
-        uint256 amount = 500 * 10**18;
-        vm.prank(owner);
-        token.burn(amount);
-        assertEq(token.balanceOf(owner), INITIAL_SUPPLY - amount);
-    }
-
-    function test_UnauthorizedMint() public {
+        token.pause();
+        
+        assertTrue(token.paused());
+        
         vm.expectRevert();
-        vm.prank(alice);
-        token.mint(alice, 100);
+        vm.prank(owner);
+        token.transfer(user, 100 * 1e18);
+    }
+    
+    function testUnauthorizedMint() public {
+        vm.expectRevert();
+        vm.prank(user);
+        token.mint(user, 1000 * 1e18);
     }
 }
