@@ -152,3 +152,49 @@ contract CognixMarket is ICognixMarket, ReentrancyGuard, Ownable, Pausable {
         
         emit TaskCancelled(_taskId);
     }
+    function raiseDispute(uint256 _taskId) external whenNotPaused {
+        require(_taskId > 0 && _taskId <= taskCount, "Invalid task ID");
+        require(tasks[_taskId].status == TaskStatus.ProofSubmitted, "No proof to dispute");
+        require(tasks[_taskId].employer == msg.sender || tasks[_taskId].assignee == msg.sender, "Not authorized");
+        
+        tasks[_taskId].status = TaskStatus.Disputed;
+        tasks[_taskId].updatedAt = block.timestamp;
+        emit DisputeRaised(_taskId, msg.sender);
+    }
+
+    function resolveDispute(uint256 _taskId, bool _favorEmployer) external whenNotPaused {
+        require(msg.sender == arbitrator, "Only arbitrator can resolve");
+        require(_taskId > 0 && _taskId <= taskCount, "Invalid task ID");
+        require(tasks[_taskId].status == TaskStatus.Disputed, "Task not disputed");
+        
+        Task storage task = tasks[_taskId];
+        task.updatedAt = block.timestamp;
+        
+        if (_favorEmployer) {
+            task.status = TaskStatus.Cancelled;
+            // Refund employer
+            if (task.token == address(0)) {
+                payable(task.employer).transfer(task.reward);
+            } else {
+                IERC20(task.token).safeTransfer(task.employer, task.reward);
+            }
+            // Penalize agent reputation
+            if (agentReputation[task.assignee] > task.reward / 1e15) {
+                agentReputation[task.assignee] -= task.reward / 1e15;
+            } else {
+                agentReputation[task.assignee] = 0;
+            }
+        } else {
+            task.status = TaskStatus.Completed;
+            // Pay agent
+            if (task.token == address(0)) {
+                payable(task.assignee).transfer(task.reward);
+            } else {
+                IERC20(task.token).safeTransfer(task.assignee, task.reward);
+            }
+            // Reward agent reputation
+            agentReputation[task.assignee] += task.reward / 1e15;
+        }
+        
+        emit DisputeResolved(_taskId, !_favorEmployer);
+    }
