@@ -62,4 +62,11 @@ contract CognixERC1155 is ERC165, IERC1155 {
         _operatorApprovals[msg.sender][operator] = approved;
         emit ApprovalForAll(msg.sender, operator, approved);
     }
+    
+    /**
+     * @dev See {IERC1155-isApprovedForAll}.
+     */
+    function isApprovedForAll(address account, address operator) public view virtual override returns (bool) {
+        return _operatorApprovals[account][operator];
+    }
 }
