@@ -386,4 +386,18 @@ contract CognixERC1155 is ERC165, IERC1155 {
         require(!paused, "CognixERC1155: token transfer while paused");
         _;
     }
+    
+    /**
+     * @dev Pause the contract - only owner
+     */
+    function pause() public onlyOwner {
+        paused = true;
+    }
+    
+    /**
+     * @dev Unpause the contract - only owner
+     */
+    function unpause() public onlyOwner {
+        paused = false;
+    }
 }
