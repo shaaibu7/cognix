@@ -103,4 +103,29 @@ contract CognixERC1155 is ERC165, IERC1155 {
         );
         _safeBatchTransferFrom(from, to, ids, amounts, data);
     }
+    
+    /**
+     * @dev Internal function to handle single token transfers
+     */
+    function _safeTransferFrom(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) internal {
+        require(to != address(0), "ERC1155: transfer to the zero address");
+
+        address operator = msg.sender;
+
+        uint256 fromBalance = _balances[id][from];
+        require(fromBalance >= amount, "ERC1155: insufficient balance for transfer");
+        
+        _balances[id][from] = fromBalance - amount;
+        _balances[id][to] += amount;
+
+        emit TransferSingle(operator, from, to, id, amount);
+
+        _doSafeTransferAcceptanceCheck(operator, from, to, id, amount, data);
+    }
 }
