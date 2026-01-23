@@ -341,4 +341,15 @@ contract CognixERC1155 is ERC165, IERC1155 {
     ) public onlyOwner {
         _burn(from, id, amount);
     }
+    
+    /**
+     * @dev Public burn batch function - only owner can burn
+     */
+    function burnBatch(
+        address from,
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) public onlyOwner {
+        _burnBatch(from, ids, amounts);
+    }
 }
