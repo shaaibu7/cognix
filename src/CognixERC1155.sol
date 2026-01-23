@@ -86,4 +86,21 @@ contract CognixERC1155 is ERC165, IERC1155 {
         );
         _safeTransferFrom(from, to, id, amount, data);
     }
+    
+    /**
+     * @dev See {IERC1155-safeBatchTransferFrom}.
+     */
+    function safeBatchTransferFrom(
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) public virtual override {
+        require(
+            from == msg.sender || isApprovedForAll(from, msg.sender),
+            "ERC1155: transfer caller is not owner nor approved"
+        );
+        _safeBatchTransferFrom(from, to, ids, amounts, data);
+    }
 }
