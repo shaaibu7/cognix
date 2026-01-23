@@ -306,4 +306,16 @@ contract CognixERC1155 is ERC165, IERC1155 {
     constructor() {
         owner = msg.sender;
     }
+    
+    /**
+     * @dev Public mint function - only owner can mint
+     */
+    function mint(
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) public onlyOwner {
+        _mint(to, id, amount, data);
+    }
 }
