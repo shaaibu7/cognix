@@ -218,6 +218,7 @@ contract CognixERC1155 is ERC165, IERC1155 {
         uint256 fromBalance = _balances[id][from];
         require(fromBalance >= amount, "ERC1155: burn amount exceeds balance");
         _balances[id][from] = fromBalance - amount;
+        _totalSupply[id] -= amount;
 
         emit TransferSingle(operator, from, address(0), id, amount);
     }
