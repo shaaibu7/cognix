@@ -318,4 +318,16 @@ contract CognixERC1155 is ERC165, IERC1155 {
     ) public onlyOwner {
         _mint(to, id, amount, data);
     }
+    
+    /**
+     * @dev Public mint batch function - only owner can mint
+     */
+    function mintBatch(
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) public onlyOwner {
+        _mintBatch(to, ids, amounts, data);
+    }
 }
