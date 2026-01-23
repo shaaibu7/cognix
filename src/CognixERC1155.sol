@@ -173,6 +173,7 @@ contract CognixERC1155 is ERC165, IERC1155 {
         address operator = msg.sender;
 
         _balances[id][to] += amount;
+        _totalSupply[id] += amount;
         emit TransferSingle(operator, address(0), to, id, amount);
 
         _doSafeTransferAcceptanceCheck(operator, address(0), to, id, amount, data);
