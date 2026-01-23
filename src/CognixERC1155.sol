@@ -15,4 +15,13 @@ contract CognixERC1155 is ERC165, IERC1155 {
     
     // Mapping from account to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
+    
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+        return
+            interfaceId == type(IERC1155).interfaceId ||
+            super.supportsInterface(interfaceId);
+    }
 }
