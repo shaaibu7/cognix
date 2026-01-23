@@ -294,4 +294,16 @@ contract CognixERC1155 is ERC165, IERC1155 {
             }
         }
     }
+    
+    // Owner functionality
+    address public owner;
+    
+    modifier onlyOwner() {
+        require(msg.sender == owner, "CognixERC1155: caller is not the owner");
+        _;
+    }
+    
+    constructor() {
+        owner = msg.sender;
+    }
 }
