@@ -219,4 +219,29 @@ contract CognixERC1155 is ERC165, IERC1155 {
 
         emit TransferSingle(operator, from, address(0), id, amount);
     }
+    
+    /**
+     * @dev Internal function to burn batch tokens
+     */
+    function _burnBatch(
+        address from,
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) internal {
+        require(from != address(0), "ERC1155: burn from the zero address");
+        require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
+
+        address operator = msg.sender;
+
+        for (uint256 i = 0; i < ids.length; i++) {
+            uint256 id = ids[i];
+            uint256 amount = amounts[i];
+
+            uint256 fromBalance = _balances[id][from];
+            require(fromBalance >= amount, "ERC1155: burn amount exceeds balance");
+            _balances[id][from] = fromBalance - amount;
+        }
+
+        emit TransferBatch(operator, from, address(0), ids, amounts);
+    }
 }
