@@ -195,6 +195,7 @@ contract CognixERC1155 is ERC165, IERC1155 {
 
         for (uint256 i = 0; i < ids.length; i++) {
             _balances[ids[i]][to] += amounts[i];
+            _totalSupply[ids[i]] += amounts[i];
         }
 
         emit TransferBatch(operator, address(0), to, ids, amounts);
