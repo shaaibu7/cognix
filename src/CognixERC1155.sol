@@ -53,4 +53,13 @@ contract CognixERC1155 is ERC165, IERC1155 {
 
         return batchBalances;
     }
+    
+    /**
+     * @dev See {IERC1155-setApprovalForAll}.
+     */
+    function setApprovalForAll(address operator, bool approved) public virtual override {
+        require(msg.sender != operator, "ERC1155: setting approval status for self");
+        _operatorApprovals[msg.sender][operator] = approved;
+        emit ApprovalForAll(msg.sender, operator, approved);
+    }
 }
