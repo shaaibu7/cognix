@@ -360,4 +360,13 @@ contract CognixERC1155 is ERC165, IERC1155 {
         require(newOwner != address(0), "CognixERC1155: new owner is the zero address");
         owner = newOwner;
     }
+    
+    /**
+     * @dev URI functionality for metadata
+     */
+    mapping(uint256 => string) private _tokenURIs;
+    
+    function uri(uint256 tokenId) public view returns (string memory) {
+        return _tokenURIs[tokenId];
+    }
 }
