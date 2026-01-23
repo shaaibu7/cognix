@@ -24,4 +24,12 @@ contract CognixERC1155 is ERC165, IERC1155 {
             interfaceId == type(IERC1155).interfaceId ||
             super.supportsInterface(interfaceId);
     }
+    
+    /**
+     * @dev See {IERC1155-balanceOf}.
+     */
+    function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
+        require(account != address(0), "ERC1155: balance query for the zero address");
+        return _balances[id][account];
+    }
 }
