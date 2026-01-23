@@ -96,7 +96,7 @@ contract CognixERC1155 is ERC165, IERC1155 {
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory data
-    ) public virtual override {
+    ) public virtual override whenNotPaused {
         require(
             from == msg.sender || isApprovedForAll(from, msg.sender),
             "ERC1155: transfer caller is not owner nor approved"
