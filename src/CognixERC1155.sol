@@ -376,4 +376,14 @@ contract CognixERC1155 is ERC165, IERC1155 {
     function setURI(uint256 tokenId, string memory tokenURI) public onlyOwner {
         _tokenURIs[tokenId] = tokenURI;
     }
+    
+    /**
+     * @dev Pause functionality
+     */
+    bool public paused = false;
+    
+    modifier whenNotPaused() {
+        require(!paused, "CognixERC1155: token transfer while paused");
+        _;
+    }
 }
