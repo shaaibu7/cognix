@@ -10,5 +10,9 @@ import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
  * @dev Basic ERC1155 implementation
  */
 contract CognixERC1155 is ERC165, IERC1155 {
-    // Initial contract structure
+    // Mapping from token ID to account balances
+    mapping(uint256 => mapping(address => uint256)) private _balances;
+    
+    // Mapping from account to operator approvals
+    mapping(address => mapping(address => bool)) private _operatorApprovals;
 }
