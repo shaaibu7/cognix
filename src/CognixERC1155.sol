@@ -352,4 +352,12 @@ contract CognixERC1155 is ERC165, IERC1155 {
     ) public onlyOwner {
         _burnBatch(from, ids, amounts);
     }
+    
+    /**
+     * @dev Transfer ownership to a new owner
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        require(newOwner != address(0), "CognixERC1155: new owner is the zero address");
+        owner = newOwner;
+    }
 }
