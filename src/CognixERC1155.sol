@@ -400,4 +400,13 @@ contract CognixERC1155 is ERC165, IERC1155 {
     function unpause() public onlyOwner {
         paused = false;
     }
+    
+    /**
+     * @dev Total supply tracking
+     */
+    mapping(uint256 => uint256) private _totalSupply;
+    
+    function totalSupply(uint256 id) public view returns (uint256) {
+        return _totalSupply[id];
+    }
 }
