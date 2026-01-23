@@ -369,4 +369,11 @@ contract CognixERC1155 is ERC165, IERC1155 {
     function uri(uint256 tokenId) public view returns (string memory) {
         return _tokenURIs[tokenId];
     }
+    
+    /**
+     * @dev Set URI for a specific token - only owner
+     */
+    function setURI(uint256 tokenId, string memory tokenURI) public onlyOwner {
+        _tokenURIs[tokenId] = tokenURI;
+    }
 }
